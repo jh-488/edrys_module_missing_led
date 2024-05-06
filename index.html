@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="A challenge module for Edrys Lite, to turn on the missing LED." />
+    <meta name="show-in" content="station" />
+    <title>Edrys Missing LED Module</title>
+
+    <script src="https://cross-lab-project.github.io/edrys-Lite/module/edrys.js"></script>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+
+    <script
+      defer
+      src="https://cross-lab-project.github.io/edrys-Lite/module/vendor/alpine.min.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cross-lab-project.github.io/edrys-Lite/module/vendor/water.min.css"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app">
+        <h1 class="title">Missing LED</h1>
+
+        <div class="home_container">
+            <button class="btn1" id="start_challenge" title="Click to start the challenge">Start</button>
+            <p id="server_not_connected" class="error">Error: Server not connected!!</p>
+        </div>
+
+        <div class="waiting_container">
+            <p>Randomizing LEDs, please wait...</p>
+            <div class="spinner"></div>
+            <p id="internal_server_error" class="error"></p>
+        </div>
+
+        <div class="challenge_container">
+            <div class="timer">
+                <svg class="timer-svg" viewBox="0 0 100 100" >
+                  <circle class="timer-circle" cx="50" cy="50" r="45"/>
+                </svg>
+                <div class="countdown"></div>
+            </div>
+        </div>
+
+        <div class="feedback_container">
+            <p id="feedback_message"></p>
+            <button class="btn1" id="try_again">Try Again</button>
+        </div>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
