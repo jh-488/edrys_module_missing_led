@@ -8,6 +8,6 @@ When finished, the user can start solving the challenge in the editor. Solving t
 Use this URL to add the module to your class:
 
 ```
-    TODO
+    https://jh-488.github.io/edrys_module_missing_led/index.html
 ```
 
