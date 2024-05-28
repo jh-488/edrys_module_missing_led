@@ -25,6 +25,11 @@ Edrys.onReady(() => {
 
 });
 
+const changeTab = (showContainers, hideContainers, displayStyle) => {
+  hideContainers.forEach(container => container.style.display = 'none');
+  showContainers.forEach(container => container.style.display = displayStyle);
+};
+
 // connect to the websocket server
 var socket = new WebSocket(Edrys?.module?.serverURL || "ws://localhost:8080");
 
@@ -40,8 +45,7 @@ startChallenge.onclick = () => {
       })
     );
 
-    homeContainer.style.display = "none";
-    waiting_container.style.display = "block";
+    changeTab([waiting_container], [homeContainer], "block");
   }
 };
 
@@ -53,8 +57,7 @@ socket.onmessage = (event) => {
     InternalServerError.style.display = "block";
     InternalServerError.innerHTML = data.error;
   } else if (data.ledsRandomized) {
-    waiting_container.style.display = "none";
-    challengeContainer.style.display = "block";
+    changeTab([challengeContainer], [waiting_container], "block");
     startTimer();
   }
 };
@@ -119,9 +122,7 @@ const startTimer = () => {
 // Set the feedback message and show the feedback container
 const setFeedbackMessage = (message) => {
   feedbackMessage.textContent = message;
-  title.style.display = "none";
-  challengeContainer.style.display = "none";
-  feedbackContainer.style.display = "flex";
+  changeTab([feedbackContainer], [challengeContainer, title], "flex");
 };
 
 // Handle received messages from the code editor module
@@ -150,8 +151,7 @@ tryAgainButton.onclick = () => {
     title.style.display = "block";
     appContainer.classList.remove("red-bg");
     appContainer.classList.remove("green-bg");
-    feedbackContainer.style.display = "none";
-    homeContainer.style.display = "block";
+    changeTab([homeContainer], [feedbackContainer], "block");
 
     Edrys.sendMessage("timer-ended", "Timer ended!");
 };
