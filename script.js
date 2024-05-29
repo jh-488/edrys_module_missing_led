@@ -40,8 +40,8 @@ startChallenge.onclick = () => {
   } else {
     socket.send(
       JSON.stringify({
-        challengeId: "missing-led",
-        action: "randomizeLeds",
+        challengeId: "randomize-leds",
+        code: "",
       })
     );
 
