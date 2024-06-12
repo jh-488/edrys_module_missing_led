@@ -20,9 +20,12 @@ const feedbackContainer = document.querySelector(".feedback_container");
 const feedbackMessage = document.getElementById("feedback_message");
 const tryAgainButton = document.getElementById("try_again");
 
+let timerStart;
+
 Edrys.onReady(() => {
   console.log("Module Missing LED is loaded!");
 
+  timerStart = Edrys.module.config.timer ? Edrys.module.config.timer : 5;
 });
 
 const changeTab = (showContainers, hideContainers, displayStyle) => {
@@ -62,7 +65,6 @@ socket.onmessage = (event) => {
   }
 };
 
-let timerStart = 2;
 let time;
 let timerInterval;
 
@@ -111,12 +113,20 @@ const stopTimer = () => {
   updateCountdown();
 };
 
-// Handle the timer start
+// Handle the timer start/pause/continue events
 const startTimer = () => {
   time = timerStart * 60;
   updateCountdown();
   timerInterval = setInterval(updateCountdown, 1000);
   Edrys.sendMessage("timer-started", "Timer started!");
+};
+
+const pauseTimer = () => {
+  clearInterval(timerInterval);
+};
+
+const continueTimer = () => {
+  timerInterval = setInterval(updateCountdown, 1000);
 };
 
 // Set the feedback message and show the feedback container
@@ -143,6 +153,10 @@ Edrys.onMessage(({ from, subject, body, module }) => {
         ? `Congrats! Challenge solved in ${minutes} minutes and ${seconds} seconds!`
         : `Congrats! Challenge solved in ${seconds} seconds!`
     );
+  } else if (subject === "pause-timer") {
+    pauseTimer();
+  } else if (subject === "continue-timer") {
+    continueTimer();
   }
 }, (promiscuous = true));
 
