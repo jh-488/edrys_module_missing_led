@@ -38,18 +38,9 @@ var socket = new WebSocket(Edrys?.module?.serverURL || "ws://localhost:8080");
 
 // send a message to the server to start the challenge
 startChallenge.onclick = () => {
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    serverNotConnectedError.style.display = "block";
-  } else {
-    socket.send(
-      JSON.stringify({
-        challengeId: "randomize-leds",
-        code: "",
-      })
-    );
+  Edrys.sendMessage("reandomize-leds", "Randomize LEDs!");
 
-    changeTab([waiting_container], [homeContainer], "block");
-  }
+  changeTab([waiting_container], [homeContainer], "block");
 };
 
 
@@ -57,11 +48,9 @@ socket.onmessage = (event) => {
   var data = JSON.parse(event.data);
 
   if (data.error) {
-    InternalServerError.style.display = "block";
-    InternalServerError.innerHTML = data.error;
+    Edrys.sendMessage("server-error", "Server error!");
   } else if (data.ledsRandomized) {
-    changeTab([challengeContainer], [waiting_container], "block");
-    startTimer();
+    Edrys.sendMessage("leds-randomized", "LEDs randomized!");
   }
 };
 
@@ -159,6 +148,29 @@ Edrys.onMessage(({ from, subject, body, module }) => {
     continueTimer();
   }
 }, (promiscuous = true));
+
+Edrys.onMessage(({ from, subject, body }) => {
+  if (subject === "reandomize-leds") {
+    if (Edrys.role === "station") {
+      if (!socket || socket.readyState !== WebSocket.OPEN) {
+        serverNotConnectedError.style.display = "block";
+      } else {
+        socket.send(
+          JSON.stringify({
+            challengeId: "randomize-leds",
+            code: "",
+          })
+        );
+      }
+    }
+  } else if (subject === "leds-randomized") {
+    changeTab([challengeContainer], [waiting_container], "block");
+    startTimer();
+  } else if (subject === "server-error") {
+    InternalServerError.style.display = "block";
+    InternalServerError.innerHTML = data.error;
+  }
+});
 
 
 tryAgainButton.onclick = () => {
