@@ -38,18 +38,7 @@ var socket = new WebSocket(Edrys?.module?.serverURL || "ws://localhost:8080");
 
 // send a message to the server to start the challenge
 startChallenge.onclick = () => {
-  if (!socket || socket.readyState !== WebSocket.OPEN) {
-    serverNotConnectedError.style.display = "block";
-  } else {
-    socket.send(
-      JSON.stringify({
-        challengeId: "randomize-leds",
-        code: "",
-      })
-    );
-
-    changeTab([waiting_container], [homeContainer], "block");
-  }
+  Edrys.sendMessage("randomize-leds", "LEDs randomized!");
 };
 
 
@@ -153,6 +142,19 @@ Edrys.onMessage(({ from, subject, body, module }) => {
         ? `Congrats! Challenge solved in ${minutes} minutes and ${seconds} seconds!`
         : `Congrats! Challenge solved in ${seconds} seconds!`
     );
+  } else if (subject === "randomize-leds") {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      serverNotConnectedError.style.display = "block";
+    } else {
+      socket.send(
+        JSON.stringify({
+          challengeId: "randomize-leds",
+          code: "",
+        })
+      );
+  
+      changeTab([waiting_container], [homeContainer], "block");
+    }
   } else if (subject === "pause-timer") {
     pauseTimer();
   } else if (subject === "continue-timer") {
