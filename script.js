@@ -38,9 +38,7 @@ var socket = new WebSocket(Edrys?.module?.serverURL || "ws://localhost:8080");
 
 // send a message to the server to start the challenge
 startChallenge.onclick = () => {
-  Edrys.sendMessage("reandomize-leds", "Randomize LEDs!");
-
-  changeTab([waiting_container], [homeContainer], "block");
+  Edrys.sendMessage("randomize-leds", "Randomize LEDs!");
 };
 
 
@@ -48,7 +46,7 @@ socket.onmessage = (event) => {
   var data = JSON.parse(event.data);
 
   if (data.error) {
-    Edrys.sendMessage("server-error", "Server error!");
+    Edrys.sendMessage("internal-server-error", data.error);
   } else if (data.ledsRandomized) {
     Edrys.sendMessage("leds-randomized", "LEDs randomized!");
   }
@@ -149,26 +147,39 @@ Edrys.onMessage(({ from, subject, body, module }) => {
   }
 }, (promiscuous = true));
 
+
 Edrys.onMessage(({ from, subject, body }) => {
-  if (subject === "reandomize-leds") {
-    if (Edrys.role === "station") {
-      if (!socket || socket.readyState !== WebSocket.OPEN) {
-        serverNotConnectedError.style.display = "block";
-      } else {
-        socket.send(
-          JSON.stringify({
-            challengeId: "randomize-leds",
-            code: "",
-          })
-        );
-      }
-    }
-  } else if (subject === "leds-randomized") {
-    changeTab([challengeContainer], [waiting_container], "block");
-    startTimer();
-  } else if (subject === "server-error") {
-    InternalServerError.style.display = "block";
-    InternalServerError.innerHTML = data.error;
+  switch (subject) {
+    case "randomize-leds":
+      if (Edrys.role === "station") {
+        if (!socket || socket.readyState !== WebSocket.OPEN) {
+          Edrys.sendMessage("server-not-connected", "Server not connected!");
+        } else {
+          socket.send(
+            JSON.stringify({
+              challengeId: "randomize-leds",
+              code: "",
+            })
+          );
+  
+          Edrys.sendMessage("server-connected", "Server connected!");
+        }
+      };
+      break;
+    case "leds-randomized":
+      changeTab([challengeContainer], [waiting_container], "block");
+      startTimer();
+      break;
+    case "server-connected":
+      changeTab([waiting_container], [homeContainer], "block");
+      break;
+    case "server-not-connected":
+      serverNotConnectedError.style.display = "block";
+      break;
+    case "internal-server-error":
+      InternalServerError.style.display = "block";
+      InternalServerError.innerHTML = body;
+      break;
   }
 });
 
